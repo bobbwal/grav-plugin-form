@@ -532,18 +532,20 @@ class Form extends Iterator implements \Serializable
             }
 
             $i = 0;
-            foreach ($this->items['fields'] as $key => $field) {
-                $name = isset($field['name']) ? $field['name'] : $key;
-                if (!isset($field['name'])) {
-                    if (isset($data[$i])) { //Handle input@ false fields
-                        $data[$name] = $data[$i];
-                        unset($data[$i]);
+            foreach ($this->items['fieldsets'] as $fieldsets) {
+                foreach ($fieldsets['fields'] as $key => $field) {
+                    $name = isset($field['name']) ? $field['name'] : $key;
+                    if (!isset($field['name'])) {
+                        if (isset($data[$i])) { //Handle input@ false fields
+                            $data[$name] = $data[$i];
+                            unset($data[$i]);
+                        }
                     }
+                    if ($field['type'] == 'checkbox') {
+                        $data[$name] = isset($data[$name]) ? true : false;
+                    }
+                    $i++;
                 }
-                if ($field['type'] == 'checkbox') {
-                    $data[$name] = isset($data[$name]) ? true : false;
-                }
-                $i++;
             }
 
             $this->data->merge($data);

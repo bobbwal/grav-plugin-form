@@ -9,10 +9,12 @@
 {% set multipart = '' %}
 {% set method = form.method|upper|default('POST') %}
 
-{% for field in form.fields %}
-    {% if (method == 'POST' and field.type == 'file') %}
-        {% set multipart = ' enctype="multipart/form-data"' %}
-    {% endif %}
+{% for fieldset in form.fieldsets %}
+  {% for field in form.fieldsets %}
+      {% if (method == 'POST' and field.type == 'file') %}
+          {% set multipart = ' enctype="multipart/form-data"' %}
+      {% endif %}
+  {% endfor %}
 {% endfor %}
 
 {% set action = form.action ? base_url ~ form.action : base_url ~ page.route ~ uri.params %}
@@ -32,13 +34,28 @@
 
   {% block inner_markup_fields_start %}{% endblock %}
 
-  {% for field in form.fields %}
-    {% if field.type == 'file' %}
-        {% do assets.addJs('plugin://form/assets/form.min.js') %}
-    {% endif %}
-    {% set value = form.value(field.name) %}
-    {% include "forms/fields/#{field.type}/#{field.type}.html.twig" ignore missing %}
-  {% endfor %}
+  {% if form.fieldsets %}
+    {% for fieldset in form.fieldsets %}
+        <fieldset id="{{ fieldset.name }}">
+        {% for field in fieldset.fields %}
+          {% if field.type == 'file' %}
+              {% do assets.addJs('plugin://form/assets/form.min.js') %}
+          {% endif %}
+          {% set value = form.value(field.name) %}
+          {% include "forms/fields/#{field.type}/#{field.type}.html.twig" ignore missing %}
+        {% endfor %}
+        </fieldset>
+    {% endfor %}
+
+    {% else %}
+      {% for field in form.fields %}
+        {% if field.type == 'file' %}
+            {% do assets.addJs('plugin://form/assets/form.min.js') %}
+        {% endif %}
+        {% set value = form.value(field.name) %}
+        {% include "forms/fields/#{field.type}/#{field.type}.html.twig" ignore missing %}
+      {% endfor %}
+  {% endif %}
 
   {% include "forms/fields/formname/formname.html.twig" %}
 

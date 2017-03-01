@@ -520,10 +520,12 @@ class FormPlugin extends Plugin
      */
     protected function process($form)
     {
-        foreach ($form->fields as $field) {
-            if (isset($field['process'])) {
-                if (isset($field['process']['fillWithCurrentDateTime']) && $field['process']['fillWithCurrentDateTime']) {
-                    $form->setData($field['name'], gmdate('D, d M Y H:i:s', time()));
+        foreach ($form->fieldsets as $fieldset) {
+            foreach ($fieldset as $field) {
+                if (isset($field['process'])) {
+                    if (isset($field['process']['fillWithCurrentDateTime']) && $field['process']['fillWithCurrentDateTime']) {
+                        $form->setData($field['name'], gmdate('D, d M Y H:i:s', time()));
+                    }
                 }
             }
         }
